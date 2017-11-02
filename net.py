@@ -106,3 +106,28 @@ class Cifar_CNN(chainer.Chain):
         print(h.data)
         predicts = F.argmax(h, axis=1)
         return predicts.data
+
+
+class ResNet50to5Class(chainer.Chain):
+    def __init__(self, n_out):
+        super(ResNet50to5Class, self).__init__()
+        with self.init_scope():
+            self.model = L.ResNet50Layers()
+            self.fc1 = L.Linear(None, n_out)
+
+    def __call__(self, x, t):
+        h = self.model(x, ['pool5'])['pool5']
+        # print(h.shape)
+        h = F.softmax(self.fc1(h))
+        # print(h.shape)
+
+        t = self.xp.asarray(t, self.xp.int32)
+        loss = F.softmax_cross_entropy(h, t)
+        accuracy = F.accuracy(h, t)
+        chainer.report({'loss': loss}, self)
+        chainer.report({'accuracy': accuracy}, self)
+
+        if chainer.config.train:
+            return loss
+        else:
+            return h

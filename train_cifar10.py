@@ -7,9 +7,9 @@ import chainer
 from chainer import links as L
 from chainer import training
 from chainer.training import extensions
-from net import Cifar_CNN
-from dataset import MyCifarDataset
-
+# from dataset import MyCifarDataset
+from dataset import MyImageDataset
+from net import ResNet50to5Class
 
 def main():
     parser = argparse.ArgumentParser(description='Chainer example: MNIST')
@@ -38,7 +38,8 @@ def main():
     # Classifier reports softmax cross entropy loss and accuracy at every
     # iteration, which will be used by the PrintReport extension below.
     # model = Cifar_CNN(10)
-    model = L.ResNet50Layers()
+    # model = L.ResNet50Layers()
+    model = ResNet50to5Class(5)
     if args.gpu >= 0:
         # Make a specified GPU current
         chainer.cuda.get_device_from_id(args.gpu).use()
@@ -53,7 +54,7 @@ def main():
     # TODO: うまく変える
     # DONE: train num
     train, val = chainer.datasets.split_dataset_random(
-        MyCifarDataset(args.dataset),
+        MyImageDataset(args.dataset),
         900
     )
     print('train data : {}'.format(len(train)))
