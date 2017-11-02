@@ -4,10 +4,12 @@ import matplotlib
 
 matplotlib.use('Agg')
 import chainer
+from chainer import links as L
 from chainer import training
 from chainer.training import extensions
 from net import Cifar_CNN
 from dataset import MyCifarDataset
+
 
 def main():
     parser = argparse.ArgumentParser(description='Chainer example: MNIST')
@@ -23,8 +25,8 @@ def main():
                         help='Directory to output the result')
     parser.add_argument('--resume', '-r', default='',
                         help='Resume the training from snapshot')
-    parser.add_argument('--dataset', '-d', default='mini_cifar/train',
-                        help='Directory for train mini_cifar')
+    parser.add_argument('--dataset', '-d', default='image',
+                        help='Directory for train image')
     args = parser.parse_args()
 
     print('GPU: {}'.format(args.gpu))
@@ -35,7 +37,8 @@ def main():
     # Set up a neural network to train
     # Classifier reports softmax cross entropy loss and accuracy at every
     # iteration, which will be used by the PrintReport extension below.
-    model = Cifar_CNN(10)
+    # model = Cifar_CNN(10)
+    model = L.ResNet50Layers()
     if args.gpu >= 0:
         # Make a specified GPU current
         chainer.cuda.get_device_from_id(args.gpu).use()
@@ -47,9 +50,11 @@ def main():
 
     # Load the Cifar-10 mini_cifar
     # trainとvalに分ける
+    # TODO: うまく変える
+    # DONE: train num
     train, val = chainer.datasets.split_dataset_random(
         MyCifarDataset(args.dataset),
-        1000
+        900
     )
     print('train data : {}'.format(len(train)))
     print('val data : {}'.format(len(val)))
