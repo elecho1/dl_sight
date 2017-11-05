@@ -12,7 +12,7 @@ from dataset import MyImageDataset
 from net import ResNet50to5Class
 
 def main():
-    parser = argparse.ArgumentParser(description='Chainer example: MNIST')
+    parser = argparse.ArgumentParser(description='Chainer train: Tokyo sight')
     parser.add_argument('--batchsize', '-b', type=int, default=100,
                         help='Number of images in each mini-batch')
     parser.add_argument('--epoch', '-e', type=int, default=20,
@@ -25,7 +25,7 @@ def main():
                         help='Directory to output the result')
     parser.add_argument('--resume', '-r', default='',
                         help='Resume the training from snapshot')
-    parser.add_argument('--dataset', '-d', default='image',
+    parser.add_argument('--dataset', '-d', default='image/train',
                         help='Directory for train image')
     args = parser.parse_args()
 
@@ -51,7 +51,7 @@ def main():
 
     # Load the Cifar-10 mini_cifar
     # trainとvalに分ける
-    # TODO: うまく変える
+    # DONE: うまく変える
     # DONE: train num
     train, val = chainer.datasets.split_dataset_random(
         MyImageDataset(args.dataset),

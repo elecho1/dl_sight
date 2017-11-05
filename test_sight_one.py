@@ -5,24 +5,28 @@ import matplotlib
 matplotlib.use('Agg')
 import chainer
 from net import Cifar_CNN
-from dataset import MyCifarDataset
+# from dataset import MyCifarDataset
+from dataset import MyImageDataset
+from net import ResNet50to5Class
+
 
 def main():
-    parser = argparse.ArgumentParser(description='Practice: Cifar10')
-    parser.add_argument('--batchsize', '-b', type=int, default=100,
+    parser = argparse.ArgumentParser(description='One Practice: Tokyo sight')
+    parser.add_argument('--batchsize', '-b', type=int, default=1,
                         help='Number of images in each mini-batch')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--model', '-m', default='result/model_20',
                         help='Path to the model')
-    parser.add_argument('--dataset', '-d', default='mini_cifar/test',
+    parser.add_argument('--dataset', '-d', default='image/test',
                         help='Directory for train mini_cifar')
     args = parser.parse_args()
 
     print('GPU: {}'.format(args.gpu))
     print('')
 
-    model = Cifar_CNN(10)
+    #model = Cifar_CNN(10)
+    model = ResNet50to5Class(5)
     chainer.serializers.load_npz(args.model, model)
 
     if args.gpu >= 0:
@@ -32,7 +36,7 @@ def main():
 
     # Load the Cifar-10 mini_cifar
     # trainとvalに分ける
-    test = MyCifarDataset(args.dataset)
+    test = MyImageDataset(args.dataset)
     print('test data : {}'.format(len(test)))
 
     test_iter = chainer.iterators.SerialIterator(test, args.batchsize,
@@ -48,10 +52,12 @@ def main():
         labels = model.xp.array([label for _, label in batch])
         predicts = model.predict(images)
         for l, p in zip(labels, predicts):
+            print("label:", test.get_key_from_label(l),',', "predict:", test.get_key_from_label(p), '\n')
             if l == p:
                 correct_cnt += 1
 
-    print('accuracy : {}'.format(correct_cnt/len(test)))
+
+    # print('accuracy : {}'.format(correct_cnt/len(test)))
 
 
 if __name__ == '__main__':

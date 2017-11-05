@@ -131,3 +131,12 @@ class ResNet50to5Class(chainer.Chain):
             return loss
         else:
             return h
+
+    def predict(self, x):
+        #minibatch_size = x.shape[0]
+        #h = F.reshape(x, (minibatch_size, 1, 224, 224))
+        h = self.model(x, ['pool5'])['pool5']
+        h = F.softmax(self.fc1(h))
+        print(h.data)
+        predicts = F.argmax(h, axis=1)
+        return predicts.data

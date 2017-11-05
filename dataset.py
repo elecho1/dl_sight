@@ -14,6 +14,13 @@ class MyImageDataset(chainer.dataset.DatasetMixin):
         #files = os.listdir(train_dir)
         #self._paths = [os.path.join(train_dir, f) for f in files if os.path.isdir(os.path.join(train_dir, f))]
         self._paths = glob(train_dir+"/*/*/*.jpg")
+        self._paths += glob(train_dir + "/*/*/*.png")
+        self._paths += glob(train_dir+"/*/*.jpg")
+        self._paths += glob(train_dir + "/*/*.png")
+        self._paths += glob(train_dir + "/*/*/*.JPG")
+        self._paths += glob(train_dir + "/*/*/*.PNG")
+        self._paths += glob(train_dir + "/*/*.JPG")
+        self._paths += glob(train_dir + "/*/*.PNG")
 
          # added end
 
@@ -24,7 +31,7 @@ class MyImageDataset(chainer.dataset.DatasetMixin):
             'tds': 3,
             'tokyo_tower': 4,
         }
-        # self._labels_inv = {v:k for k, v in self._labels.items()}
+        self._labels_inv = {v:k for k, v in self._labels.items()}
         # print(self._labels_inv)
 
     def __len__(self):
@@ -65,3 +72,5 @@ class MyImageDataset(chainer.dataset.DatasetMixin):
         return label
         # raise NotImplementedError
 
+    def get_key_from_label(self, label):
+        return self._labels_inv[label]
