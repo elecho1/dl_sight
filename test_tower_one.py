@@ -6,7 +6,8 @@ matplotlib.use('Agg')
 import chainer
 from net import Cifar_CNN
 # from dataset import MyCifarDataset
-from dataset import MyImageDataset
+# from dataset import MyImageDataset
+from dataset import MyTowerDataset
 from net import ResNet50toNClass
 
 
@@ -16,9 +17,9 @@ def main():
                         help='Number of images in each mini-batch')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--model', '-m', default='result/sight/model_20',
+    parser.add_argument('--model', '-m', default='result/tower/model_20',
                         help='Path to the model')
-    parser.add_argument('--dataset', '-d', default=['image/test'], nargs='*',
+    parser.add_argument('--dataset', '-d', default=['image/test'], nargs="*",
                         help='Directory for train mini_cifar')
     args = parser.parse_args()
 
@@ -26,7 +27,7 @@ def main():
     print('')
 
     #model = Cifar_CNN(10)
-    model = ResNet50toNClass(5)
+    model = ResNet50toNClass(2)
     chainer.serializers.load_npz(args.model, model)
 
     if args.gpu >= 0:
@@ -36,7 +37,7 @@ def main():
 
     # Load the Cifar-10 mini_cifar
     # trainとvalに分ける
-    test = MyImageDataset(args.dataset)
+    test = MyTowerDataset(args.dataset)
     print('test data : {}'.format(len(test)))
 
     test_iter = chainer.iterators.SerialIterator(test, args.batchsize,
@@ -54,11 +55,15 @@ def main():
         labels = model.xp.array([label for _, label in batch])
         predicts = model.predict(images)
         for l, p in zip(labels, predicts):
+            # print("label:", test.get_key_from_label(l),',', "predict:", test.get_key_from_label(p), '\n')
             path = paths[current_itr]
-            print("path:", path, "label:", test.get_key_from_label(l),',', "predict:", test.get_key_from_label(p), '\n')
+            print("path:", path, "label:", test.get_key_from_label(l), ',', "predict:", test.get_key_from_label(p),
+                  '\n')
             if l == p:
                 correct_cnt += 1
+
         current_itr += 1
+
 
     # print('accuracy : {}'.format(correct_cnt/len(test)))
 

@@ -108,9 +108,9 @@ class Cifar_CNN(chainer.Chain):
         return predicts.data
 
 
-class ResNet50to5Class(chainer.Chain):
+class ResNet50toNClass(chainer.Chain):
     def __init__(self, n_out):
-        super(ResNet50to5Class, self).__init__()
+        super(ResNet50toNClass, self).__init__()
         with self.init_scope():
             self.model = L.ResNet50Layers()
             self.fc1 = L.Linear(None, n_out)

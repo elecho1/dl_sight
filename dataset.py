@@ -4,23 +4,33 @@ from PIL import Image
 import numpy as np
 from glob import glob
 import os
+import imghdr
 
 class MyImageDataset(chainer.dataset.DatasetMixin):
-    def __init__(self, train_dir):
+    def __init__(self, train_dirs):
         # DONE !
         # TODO self._pathsに全ての画像のpathをリスト状に保存する
         self._paths = []
         # added
         #files = os.listdir(train_dir)
         #self._paths = [os.path.join(train_dir, f) for f in files if os.path.isdir(os.path.join(train_dir, f))]
-        self._paths = glob(train_dir+"/*/*/*.jpg")
-        self._paths += glob(train_dir + "/*/*/*.png")
-        self._paths += glob(train_dir+"/*/*.jpg")
-        self._paths += glob(train_dir + "/*/*.png")
-        self._paths += glob(train_dir + "/*/*/*.JPG")
-        self._paths += glob(train_dir + "/*/*/*.PNG")
-        self._paths += glob(train_dir + "/*/*.JPG")
-        self._paths += glob(train_dir + "/*/*.PNG")
+
+        print(train_dirs)
+        print(type(train_dirs))
+
+        for top in train_dirs:
+            for (root, dirs, files) in os.walk(top):  # 再帰的に探索
+                for file in files:  # ファイル名だけ取得
+                    target = os.path.join(root, file).replace("\\", "/")  # フルパス取得
+                    if os.path.isfile(target):  # ファイルかどうか判別
+                        print(target)
+                        self._paths.append(target)
+
+
+        # self._paths = glob(train_dir+"/*/*/*.jpg")
+        # self._paths += glob(train_dir + "/*/*/*.png")
+        # self._paths += glob(train_dir + "/*/*/*.JPG")
+        # self._paths += glob(train_dir + "/*/*/*.PNG")
 
          # added end
 
@@ -74,3 +84,41 @@ class MyImageDataset(chainer.dataset.DatasetMixin):
 
     def get_key_from_label(self, label):
         return self._labels_inv[label]
+
+    def get_paths(self):
+        return self._paths
+
+class MyTowerDataset(MyImageDataset):
+    def __init__(self, train_dirs):
+        # DONE !
+        # TODO self._pathsに全ての画像のpathをリスト状に保存する
+        self._paths = []
+        # added
+        #files = os.listdir(train_dir)
+        #self._paths = [os.path.join(train_dir, f) for f in files if os.path.isdir(os.path.join(train_dir, f))]
+
+        for top in train_dirs:
+            list = []
+            # self._paths = glob(train_dir+"/*/*/*.jpg")
+            # self._paths += glob(train_dir + "/*/*/*.png")
+            # self._paths += glob(train_dir + "/*/*/*.JPG")
+            # self._paths += glob(train_dir + "/*/*/*.PNG")
+            list.append(glob(top+"/sky_tree/*/*.jpg"))
+            list.append(glob(top + "/tokyo_tower/*/*.jpg"))
+            len_list = [len(l) for l in list]
+            print(len_list)
+            min_len = np.min(len_list)
+
+            for i, l in enumerate(list):
+                list[i] = np.random.choice(l, min_len, replace=False)
+                self._paths.extend(list[i])
+
+         # added end
+        print(len(self._paths))
+
+        self._labels = {
+            'sky_tree': 0,
+            'tokyo_tower': 1,
+        }
+        self._labels_inv = {v:k for k, v in self._labels.items()}
+        # print(self._labels_inv)

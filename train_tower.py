@@ -8,7 +8,8 @@ from chainer import links as L
 from chainer import training
 from chainer.training import extensions
 # from dataset import MyCifarDataset
-from dataset import MyImageDataset
+# from dataset import MyImageDataset
+from dataset import MyTowerDataset
 from net import ResNet50toNClass
 
 def main():
@@ -21,12 +22,14 @@ def main():
                         help='Frequency of taking a snapshot')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--out', '-o', default='result/sight',
+    parser.add_argument('--out', '-o', default='result/tower',
                         help='Directory to output the result')
     parser.add_argument('--resume', '-r', default='',
                         help='Resume the training from snapshot')
-    parser.add_argument('--dataset', '-d', default=['image/train/'], nargs='*',
+    parser.add_argument('--dataset', '-d', default=['image/train'], nargs='*',
                         help='Directory for train image')
+    parser.add_argument('--traindatanum', '-t', type=int, default=400,
+                        help='Number of train data')
     args = parser.parse_args()
 
     print('GPU: {}'.format(args.gpu))
@@ -39,7 +42,7 @@ def main():
     # iteration, which will be used by the PrintReport extension below.
     # model = Cifar_CNN(10)
     # model = L.ResNet50Layers()
-    model = ResNet50toNClass(5)
+    model = ResNet50toNClass(2)
     if args.gpu >= 0:
         # Make a specified GPU current
         chainer.cuda.get_device_from_id(args.gpu).use()
@@ -54,8 +57,8 @@ def main():
     # DONE: うまく変える
     # DONE: train num
     train, val = chainer.datasets.split_dataset_random(
-        MyImageDataset(args.dataset),
-        900
+        MyTowerDataset(args.dataset),
+        args.traindatanum
     )
     print('train data : {}'.format(len(train)))
     print('val data : {}'.format(len(val)))

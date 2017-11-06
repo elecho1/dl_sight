@@ -7,7 +7,7 @@ import chainer
 from net import Cifar_CNN
 # from dataset import MyCifarDataset
 from dataset import MyImageDataset
-from net import ResNet50to5Class
+from net import ResNet50toNClass
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
                         help='Number of images in each mini-batch')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--model', '-m', default='result/model_20',
+    parser.add_argument('--model', '-m', default='result/sight/model_20',
                         help='Path to the model')
     parser.add_argument('--dataset', '-d', default='mini_cifar/test',
                         help='Directory for train mini_cifar')
@@ -26,7 +26,7 @@ def main():
     print('')
 
     #model = Cifar_CNN(10)
-    model = ResNet50to5Class(5)
+    model = ResNet50toNClass(5)
     chainer.serializers.load_npz(args.model, model)
 
     if args.gpu >= 0:
