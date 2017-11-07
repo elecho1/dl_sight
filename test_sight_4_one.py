@@ -6,10 +6,11 @@ matplotlib.use('Agg')
 import chainer
 from net import Cifar_CNN
 # from dataset import MyCifarDataset
-from dataset import MyImageDataset
+# from dataset import MyImageDataset
+from dataset import MyImage4Dataset
 from net import ResNet50toNClass
 
-CLASS_NUM = 5
+CLASS_NUM = 4
 
 def main():
     parser = argparse.ArgumentParser(description='One Practice: Tokyo sight')
@@ -38,7 +39,7 @@ def main():
     # Load the Cifar-10 mini_cifar
     # trainとvalに分ける
     # test = MyImage4Dataset(args.dataset, "test")
-    test = MyImageDataset(args.dataset)
+    test = MyImage4Dataset(args.dataset)
     print('test data : {}'.format(len(test)))
 
     test_iter = chainer.iterators.SerialIterator(test, args.batchsize,

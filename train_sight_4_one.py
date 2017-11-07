@@ -8,7 +8,7 @@ from chainer import links as L
 from chainer import training
 from chainer.training import extensions
 # from dataset import MyCifarDataset
-from dataset import MyImageDataset
+from dataset import MyImage4Dataset
 from net import ResNet50toNClass
 
 def main():
@@ -41,7 +41,7 @@ def main():
     # iteration, which will be used by the PrintReport extension below.
     # model = Cifar_CNN(10)
     # model = L.ResNet50Layers()
-    model = ResNet50toNClass(5)
+    model = ResNet50toNClass(4)
     if args.gpu >= 0:
         # Make a specified GPU current
         chainer.cuda.get_device_from_id(args.gpu).use()
@@ -56,7 +56,7 @@ def main():
     # DONE: うまく変える
     # DONE: train num
     train, val = chainer.datasets.split_dataset_random(
-        MyImageDataset(args.dataset),
+        MyImage4Dataset(args.dataset),
         args.traindatanum
     )
     print('train data : {}'.format(len(train)))

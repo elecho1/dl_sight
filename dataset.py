@@ -7,7 +7,7 @@ import os
 import imghdr
 
 class MyImageDataset(chainer.dataset.DatasetMixin):
-    def __init__(self, train_dirs):
+    def __init__(self, train_dirs, style="train"):
         # DONE !
         # TODO self._pathsに全ての画像のpathをリスト状に保存する
         self._paths = []
@@ -19,12 +19,30 @@ class MyImageDataset(chainer.dataset.DatasetMixin):
         print(type(train_dirs))
 
         for top in train_dirs:
-            for (root, dirs, files) in os.walk(top):  # 再帰的に探索
-                for file in files:  # ファイル名だけ取得
-                    target = os.path.join(root, file).replace("\\", "/")  # フルパス取得
-                    if os.path.isfile(target):  # ファイルかどうか判別
-                        print(target)
-                        self._paths.append(target)
+            # for (root, dirs, files) in os.walk(top):  # 再帰的に探索
+            #     for file in files:  # ファイル名だけ取得
+            #         target = os.path.join(root, file).replace("\\", "/")  # フルパス取得
+            #         if os.path.isfile(target):  # ファイルかどうか判別
+            #             print(target)
+            #             self._paths.append(target)
+            list = []
+            list.append(glob(top + "/asakusa/*/*.jpg"))
+            list.append(glob(top + "/meiji/*/*.jpg"))
+            list.append(glob(top + "/sky_tree/*/*.jpg"))
+            list.append(glob(top + "/tds/*/*.jpg"))
+            list.append(glob(top + "/tokyo_tower/*/*.jpg"))
+            len_list = [len(l) for l in list]
+            print(len_list)
+            if style == "train":
+                min_len = np.min(len_list)
+
+            for i, l in enumerate(list):
+                if style == "train":
+                    list[i] = np.random.choice(l, min_len, replace=False)
+                self._paths.extend(list[i])
+
+                # added end
+        print(len(self._paths))
 
 
         # self._paths = glob(train_dir+"/*/*/*.jpg")
@@ -89,7 +107,7 @@ class MyImageDataset(chainer.dataset.DatasetMixin):
         return self._paths
 
 class MyTowerDataset(MyImageDataset):
-    def __init__(self, train_dirs):
+    def __init__(self, train_dirs, style="train"):
         # DONE !
         # TODO self._pathsに全ての画像のpathをリスト状に保存する
         self._paths = []
@@ -99,18 +117,16 @@ class MyTowerDataset(MyImageDataset):
 
         for top in train_dirs:
             list = []
-            # self._paths = glob(train_dir+"/*/*/*.jpg")
-            # self._paths += glob(train_dir + "/*/*/*.png")
-            # self._paths += glob(train_dir + "/*/*/*.JPG")
-            # self._paths += glob(train_dir + "/*/*/*.PNG")
-            list.append(glob(top+"/sky_tree/*/*.jpg"))
+            list.append(glob(top + "/sky_tree/*/*.jpg"))
             list.append(glob(top + "/tokyo_tower/*/*.jpg"))
             len_list = [len(l) for l in list]
             print(len_list)
-            min_len = np.min(len_list)
+            if style == "train":
+                min_len = np.min(len_list)
 
             for i, l in enumerate(list):
-                list[i] = np.random.choice(l, min_len, replace=False)
+                if style == "train":
+                    list[i] = np.random.choice(l, min_len, replace=False)
                 self._paths.extend(list[i])
 
          # added end
@@ -119,6 +135,43 @@ class MyTowerDataset(MyImageDataset):
         self._labels = {
             'sky_tree': 0,
             'tokyo_tower': 1,
+        }
+        self._labels_inv = {v:k for k, v in self._labels.items()}
+        # print(self._labels_inv)
+
+
+class MyImage4Dataset(MyImageDataset):
+    def __init__(self, train_dirs, style="train"):
+        # DONE !
+        # TODO self._pathsに全ての画像のpathをリスト状に保存する
+        self._paths = []
+        # added
+
+        print(train_dirs)
+        for top in train_dirs:
+            list = []
+            list.append(glob(top + "/asakusa/*/*.jpg"))
+            list.append(glob(top + "/sky_tree/*/*.jpg"))
+            list.append(glob(top + "/tds/*/*.jpg"))
+            list.append(glob(top + "/tokyo_tower/*/*.jpg"))
+            len_list = [len(l) for l in list]
+            print(len_list)
+            if style == "train":
+                min_len = np.min(len_list)
+
+            for i, l in enumerate(list):
+                if style == "train":
+                    list[i] = np.random.choice(l, min_len, replace=False)
+                self._paths.extend(list[i])
+
+         # added end
+        print(len(self._paths))
+
+        self._labels = {
+            'asakusa': 0,
+            'sky_tree': 1,
+            'tds': 2,
+            'tokyo_tower': 3,
         }
         self._labels_inv = {v:k for k, v in self._labels.items()}
         # print(self._labels_inv)

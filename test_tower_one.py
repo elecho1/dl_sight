@@ -10,6 +10,7 @@ from net import Cifar_CNN
 from dataset import MyTowerDataset
 from net import ResNet50toNClass
 
+CLASS_NUM = 2
 
 def main():
     parser = argparse.ArgumentParser(description='One Practice: Tokyo sight')
@@ -27,7 +28,7 @@ def main():
     print('')
 
     #model = Cifar_CNN(10)
-    model = ResNet50toNClass(2)
+    model = ResNet50toNClass(CLASS_NUM)
     chainer.serializers.load_npz(args.model, model)
 
     if args.gpu >= 0:
@@ -44,6 +45,13 @@ def main():
                                                   repeat=False, shuffle=False)
 
     correct_cnt = 0
+    each_correct_cnt = []
+    each_cnt = []
+    for i in range(CLASS_NUM):
+        print(i)
+        each_correct_cnt.append(0)
+        each_cnt.append(0)
+
     paths = test.get_paths()
     current_itr = 0
     while True:
@@ -59,13 +67,17 @@ def main():
             path = paths[current_itr]
             print("path:", path, "label:", test.get_key_from_label(l), ',', "predict:", test.get_key_from_label(p),
                   '\n')
+            each_cnt[l] += 1
             if l == p:
                 correct_cnt += 1
+                each_correct_cnt[l] += 0
 
         current_itr += 1
 
 
-    # print('accuracy : {}'.format(correct_cnt/len(test)))
+    print('accuracy : {}'.format(correct_cnt/len(test)))
+    for i in range(CLASS_NUM):
+        print(test.get_key_from_label(i), " : ", each_correct_cnt[i]/each_cnt[i])
 
 
 if __name__ == '__main__':
