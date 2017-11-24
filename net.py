@@ -1,6 +1,8 @@
 import chainer
 from chainer import links as L
 from chainer import functions as F
+# from keras.layers import Input, Embedding, LSTM, Dense
+# from keras.models import Model
 
 class MLP(chainer.Chain):
     def __init__(self, n_units, n_out):
@@ -117,6 +119,40 @@ class ResNet50toNClass(chainer.Chain):
 
     def __call__(self, x, t):
         h = self.model(x, ['pool5'])['pool5']
+        # print(h.shape)
+        h = F.softmax(self.fc1(h))
+        # print(h.shape)
+
+        t = self.xp.asarray(t, self.xp.int32)
+        loss = F.softmax_cross_entropy(h, t)
+        accuracy = F.accuracy(h, t)
+        chainer.report({'loss': loss}, self)
+        chainer.report({'accuracy': accuracy}, self)
+
+        if chainer.config.train:
+            return loss
+        else:
+            return h
+
+    def predict(self, x):
+        #minibatch_size = x.shape[0]
+        #h = F.reshape(x, (minibatch_size, 1, 224, 224))
+        h = self.model(x, ['pool5'])['pool5']
+        h = F.softmax(self.fc1(h))
+        print(h.data)
+        predicts = F.argmax(h, axis=1)
+        return predicts.data
+
+class VGG16(chainer.Chain):
+    def __init__(self, n_out):
+        super(VGG16, self).__init__()
+        with self.init_scope():
+            # self.model = L.ResNet50Layers()
+            self.model = L.VGG16Layers()
+        self.fc1 = L.Linear(None, n_out)
+
+    def __call__(self, x, t):
+        h = self.model(x, ['fc7'])['fc7']
         # print(h.shape)
         h = F.softmax(self.fc1(h))
         # print(h.shape)
